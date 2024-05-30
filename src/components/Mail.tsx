@@ -14,12 +14,12 @@ const Mail: React.FC = () => {
 
   const handleSave = async () => {
     if (!validateEmail(email)) {
-      setError('Por favor, ingresa un correo electrónico válido.');
+      alert('Por favor, ingresa un correo electrónico válido.');
       return;
     }
 
     try {
-      const response = await fetch('http://localhost:3000/correos', {
+      const saveResponse = await fetch('http://localhost:3000/correos', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -27,16 +27,17 @@ const Mail: React.FC = () => {
         body: JSON.stringify({ correo: email, password }),
       });
 
-      if (!response.ok) {
+      if (!saveResponse.ok) {
         throw new Error('Network response was not ok');
       }
 
-      const data = await response.json();
-      console.log('Response:', data);
-      setError(''); 
+      alert('¡Correo electrónico guardado con éxito!');
+      setEmail('');
+      setPassword('');
+      setError('');
     } catch (error) {
       console.error('There was an error saving the email and password:', error);
-      setError('Hubo un error al guardar los datos. Por favor, intenta de nuevo.');
+      alert('Hubo un error al guardar los datos. Por favor, intenta de nuevo.');
     }
   };
 
@@ -63,7 +64,6 @@ const Mail: React.FC = () => {
           style={styles.input}
         />
       </div>
-      {error && <p style={styles.error}>{error}</p>}
       <button onClick={handleSave} style={styles.button}>Guardar</button>
       <Link to="/password" style={styles.linkButton}>Ir a Password</Link>
     </div>
@@ -82,9 +82,9 @@ const styles = {
     backgroundColor: 'rgb(134, 152, 185)',
     padding: '20px',
     borderRadius: '10px',
-    width: '50%',
+    width: '100%',
     margin: '0 auto',
-    height: '50vh', 
+    height: '100vh', 
   },
   image: {
     width: '150px',
@@ -123,10 +123,6 @@ const styles = {
     color: 'white',
     textDecoration: 'none',
     cursor: 'pointer',
-  },
-  error: {
-    color: 'red',
-    marginBottom: '10px',
   },
 };
 

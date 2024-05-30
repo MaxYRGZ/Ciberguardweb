@@ -1,45 +1,63 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import escudo from '../assets/escudo.png';
 
 const Password: React.FC = () => {
-  const [passwords, setPasswords] = useState<{ id: number; nombre: string; contraseña: string; fecha_creacion: string }[]>([]);
+  const [passwords, setPasswords] = useState<{ id: number; nombre: string; password: string; fecha: string }[]>([]);
   const [passwordChart, setPasswordChart] = useState<{ month: string; count: number }[]>([]);
-
-  const handleSave = () => {
-    console.log('Guardar contraseña en la base de datos');
-  };
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
     alert(`${text} copiado al portapapeles.`);
   };
 
-  const handleClear = (id: number) => {
-    console.log(`Borrar contraseña con ID ${id} de la base de datos`);
+  const handleClear = async (id: number) => {
+    try {
+      const response = await fetch(`http://localhost:3000/contrasena/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      // Actualizar el estado local para reflejar los cambios
+      setPasswords(prevPasswords => prevPasswords.filter(password => password.id !== id));
+      alert('Contraseña eliminada correctamente.');
+    } catch (error) {
+      console.error('There was an error deleting the password:', error);
+      alert('Hubo un error al eliminar la contraseña. Por favor, intenta de nuevo.');
+    }
   };
 
   const fetchPasswords = async () => {
-    // Simulación de obtener las contraseñas de la base de datos
-    const mockPasswords = [
-      { id: 1, nombre: 'Facebook', contraseña: 'fbpass', fecha_creacion: '2024-05-01' },
-      { id: 2, nombre: 'Gmail', contraseña: 'gmailpass', fecha_creacion: '2024-05-15' },
-      { id: 3, nombre: 'Twitter', contraseña: 'twitterpass', fecha_creacion: '2024-05-25' },
-      { id: 4, nombre: 'LinkedIn', contraseña: 'linkedinpass', fecha_creacion: '2024-05-10' },
-      { id: 5, nombre: 'Instagram', contraseña: 'instagrampass', fecha_creacion: '2024-05-20' },
-      { id: 6, nombre: 'Amazon', contraseña: 'amazonpass', fecha_creacion: '2024-05-05' },
-      // Agrega más contraseñas si es necesario
-    ];
-    setPasswords(mockPasswords);
+    try {
+      const response = await fetch('http://localhost:3000/contrasena');
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      setPasswords(data);
 
-    // Simulación de calcular la distribución de contraseñas por mes
-    const mockPasswordChart = [
-      { month: 'Enero', count: 10 },
-      { month: 'Febrero', count: 15 },
-      { month: 'Marzo', count: 8 },
-      // ...
-    ];
-    setPasswordChart(mockPasswordChart);
+      // Simulación de calcular la distribución de contraseñas por mes
+      const passwordCounts = data.reduce((acc: { [key: string]: number }, password: { fecha: string }) => {
+        const month = new Date(password.fecha).toLocaleString('es-ES', { month: 'long' });
+        if (!acc[month]) {
+          acc[month] = 0;
+        }
+        acc[month]++;
+        return acc;
+      }, {});
+
+      const mockPasswordChart = Object.keys(passwordCounts).map(month => ({
+        month,
+        count: passwordCounts[month]
+      }));
+      setPasswordChart(mockPasswordChart);
+    } catch (error) {
+      console.error('There was an error fetching the passwords:', error);
+    }
   };
 
   useEffect(() => {
@@ -54,9 +72,9 @@ const Password: React.FC = () => {
         <PasswordGrid>
           {passwords.map(password => (
             <PasswordItem key={password.id}>
-              <span>{password.nombre}: {password.contraseña}</span>
+              <span>{password.nombre}: {password.password}</span>
               <ButtonContainer>
-                <Button onClick={() => handleCopy(password.contraseña)}>Copiar</Button>
+                <Button onClick={() => handleCopy(password.password)}>Copiar</Button>
                 <Button onClick={() => handleClear(password.id)}>Borrar</Button>
               </ButtonContainer>
             </PasswordItem>
@@ -74,6 +92,7 @@ const Password: React.FC = () => {
           ))}
         </BarChart>
       </PasswordChart>
+      <LinkButton to="/">Ir a Mail</LinkButton>
     </Container>
   );
 };
@@ -86,27 +105,39 @@ const Container = styled.div`
   background-color: rgb(134, 152, 185);
   padding: 20px;
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
   font-family: Arial, sans-serif;
+  box-sizing: border-box;
+
+  @media (max-width: 768px) {
+    padding: 10px;
+  }
 `;
 
 const Image = styled.img`
   width: 150px;
   height: 150px;
   margin-bottom: 20px;
+
+  @media (max-width: 768px) {
+    width: 100px;
+    height: 100px;
+  }
 `;
 
 const PasswordList = styled.div`
+  width: 50%;
   margin-bottom: 20px;
 
   h2 {
     margin-bottom: 10px;
+    text-align: center;
   }
 `;
 
 const PasswordGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   grid-gap: 20px;
 `;
 
@@ -157,6 +188,20 @@ const Button = styled.button`
   border-radius: 5px;
   cursor: pointer;
   margin-left: 5px;
+`;
+
+const LinkButton = styled(Link)`
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: rgb(46, 79, 145);
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  text-align: center;
+
+  &:hover {
+    background-color: rgb(34, 59, 105);
+  }
 `;
 
 export default Password;
