@@ -18,6 +18,10 @@ This guide provides instructions to set up and run the API using Docker, Visual 
 Download Docker from the [Docker website](https://www.docker.com/products/docker-desktop/) and follow the installation instructions for your operating system.
 
 ### 2. Open API Project in Visual Studio Code
+Run the following command to clone the repository of api
+```bash
+git clone https://github.com/MaxYRGZ/node-sqlserver-restapi.git
+```
 
 1. Open Visual Studio Code.
 2. Open the folder containing the API project.
