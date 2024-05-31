@@ -1,6 +1,7 @@
 
-Instrucciones de instalación y ejecución.
-# API Setup and Configuration
+
+# Installation and execution instructions.
+## API Setup and Configuration
 
 This guide provides instructions to set up and run the API using Docker, Visual Studio Code, and SQL Server.
 
@@ -61,10 +62,69 @@ After completing the above steps, you can start the API by running:
 npm run dev
 ```
 
-Descripción del proyecto (estructura y uso del proyecto)
-Prototipos de la vista y cómo utilizarlas (tipo manual)
-Descripción de las pruebas y cómo ejecutarlas.
-URL de despliegue en Vercel.
+To copy the repository from GitHub, follow these steps:
+
+1.Open a terminal.
+2.Run the following command to clone the repository
+```bash
+git clone https://github.com/MaxYRGZ/Ciberguardweb.git
+```
+Open the folder in Visual and then run the following command line in the terminal:
+```bash
+npm run dev
+```
+# Project Description
+
+This project consists of two main views: one for saving emails to the database and another for displaying and graphing stored passwords.
+
+## Views and Usage (Manual)
+
+The project includes `APP.tsx`, which is responsible for routing and importing the two main views:
+
+- `Mail.tsx`
+- `Password.tsx`
+
+### Mail Component
+
+This React component renders a form for users to enter their email address and password. It includes validation to ensure the email format is correct. Upon clicking the "Save" button, the email and password are sent to a server (`http://localhost:3000/correos`) via a POST request. If successful, the form fields are cleared, and a success message is displayed; otherwise, an error message is shown. There is also a link to navigate to another route (`/password`). The component includes basic styling for layout and appearance.
+
+### Password Component
+
+This React component displays a list of passwords and allows each one to be copied or deleted. On load, it fetches passwords from a server (`http://localhost:3000/contrasena`). It also simulates a bar chart showing the distribution of passwords by month. The component includes a button to navigate to the mail view. Styled-components are used for styling, offering a responsive design.
+
+## Running the Project
+
+To run the project, navigate to the project directory and execute:
+```bash
+npm run dev
+```
+You can install the Thunder Client extension in Visual Studio Code to monitor database changes:
+
+1. Save an email on the page.
+2. Use Thunder Client to perform a GET request to http://localhost:3000/correos to see the change.
+3. On the page, click the Password button.
+4. View the stored passwords and delete one.
+5.Use Thunder Client to perform a GET request to http://localhost:3000/contrasena to see the change.
+
+# Test Description and Execution
+## Test Description
+The tests are designed to verify that the React application components render correctly and contain the expected elements.
+
+### App Component
+Verifies that the App component renders.
+Uses screen.debug() to display output in the console.
+### Mail Component
+Verifies that the Mail component renders within the BrowserRouter.
+Checks for the presence of labels and buttons: email, password, "Save" button, and link to the password view.
+### Password Component
+Verifies that the Password component renders within the BrowserRouter.
+Checks for the presence of headers and the link button to the mail view.
+## Running Tests
+To run the tests, use the terminal to execute:
+
+```bash
+npm run test
+```
 
 
 
